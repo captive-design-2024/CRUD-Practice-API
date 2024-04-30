@@ -1,27 +1,32 @@
-## TODO Left
+## 실행 순서
 
-### Application
+1. Install dependencies
 
-- [ ] Nest.js Terminus integration
-- [ ] Common library(Nest.js library)
-  - [ ] S3
-  - [ ] SQS
-  - [ ] Localstack
-- [ ] Global Exception Filter
-  - [ ] Error code definition
-- [ ] Global Response Interceptor
+```
+yarn install
+```
 
-### Test code
+2. Docker Database up and push
 
-- [ ] Test code boilerplate
-  - [ ] E2E test code boilerplate
-  - [ ] Unit test code boilerplate
-  - [ ] K6 stress test code boilerplate
-- [ ] Utilities for test code
-  - [ ] `testing-container` utility
-  - [ ] Mocking utility
+```
+yarn db:up
 
-### CI/CD
+yarn db:push
+```
 
-- [ ] Github Actions base script
-- [ ] Elastic Beanstalk boiler command and directories(Follos EB standard)
+3. Start as dev watch mode
+
+```
+yarn dev
+```
+
+4. Connect to swagger
+
+```
+localhost:3000/docs
+```
+
+## Admin Account
+
+- Email: admin@admin.com
+- Password: admin
