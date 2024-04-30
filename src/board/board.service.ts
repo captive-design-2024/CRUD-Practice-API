@@ -12,7 +12,7 @@ import {
   ListBoardResponse,
 } from './response/listBoard.response';
 import { CreateBoardResponse } from './response/createBoard.response';
-import { UpdateBoardResponse } from './response';
+import { DeleteBoardResponse, UpdateBoardResponse } from './response';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
@@ -114,6 +114,32 @@ export class BoardService {
         content: updatedBoard.content,
         created_at: updatedBoard.createdAt,
         updated_at: updatedBoard.updatedAt,
+      });
+    } catch (err) {
+      // Forbidden update request exception
+      if (
+        err instanceof PrismaClientKnownRequestError &&
+        err.code === 'P2025'
+      ) {
+        throw new NotFoundException('Board not found');
+      }
+      throw err;
+    }
+  }
+
+  async deleteBoard(userId: string, boardId: string) {
+    try {
+      const deletedBoard = await this.prisma.board.delete({
+        where: {
+          id: boardId,
+          userId: userId,
+        },
+        select: {
+          title: true,
+        },
+      });
+      return new DeleteBoardResponse({
+        title: deletedBoard.title,
       });
     } catch (err) {
       // Forbidden update request exception

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -15,6 +16,7 @@ import { GetUser } from '@app/common';
 import {
   BoardControllerDocs,
   CreateBoardDocs,
+  DeleteBoardDocs,
   ListBoardDocs,
   ReadBoardDocs,
   UpdateBoardDocs,
@@ -51,5 +53,14 @@ export class BoardController {
     @Param('boardId') boardId: string,
   ) {
     return this.service.updateBoard(userId, dto, boardId);
+  }
+
+  @Delete(':boardId')
+  @DeleteBoardDocs
+  deleteBoard(
+    @GetUser('id') userId: string,
+    @Param('boardId') boardId: string,
+  ) {
+    return this.service.deleteBoard(userId, boardId);
   }
 }
