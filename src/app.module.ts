@@ -11,6 +11,7 @@ import { LoggerModule } from './logger/logger.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AdminModule } from './admin/admin.module';
 import { HealthModule } from './health/health.module';
+import { BoardModule } from './board/board.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { HealthModule } from './health/health.module';
     AuthenticationModule,
     AdminModule,
     HealthModule,
+    BoardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
