@@ -1,8 +1,22 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ListBoardQuery } from './dto';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
+import { CreateBoardDto, ListBoardQuery } from './dto';
 import { BoardService } from './board.service';
 import { GetUser } from '@app/common';
-import { BoardControllerDocs, ListBoardDocs, ReadBoardDocs } from './docs';
+import {
+  BoardControllerDocs,
+  CreateBoardDocs,
+  ListBoardDocs,
+  ReadBoardDocs,
+} from './docs';
 
 @Controller('board')
 @BoardControllerDocs
@@ -18,5 +32,12 @@ export class BoardController {
   @ReadBoardDocs
   readBoard(@GetUser('id') userId: string, @Param('boardId') boardId: string) {
     return this.service.readBoard(userId, boardId);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post()
+  @CreateBoardDocs
+  createBoard(@GetUser('id') userId: string, @Body() dto: CreateBoardDto) {
+    return this.service.createBoard(userId, dto);
   }
 }

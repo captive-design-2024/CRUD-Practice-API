@@ -1,16 +1,13 @@
+import { PaginateMetadata } from '@app/common';
 import { PrismaService } from '@app/prisma/prisma.service';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { ListBoardQuery } from './dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { CreateBoardDto, ListBoardQuery } from './dto';
 import {
   ListBoardItem,
   ListBoardResponse,
 } from './response/listBoard.response';
-import { Prisma } from '@prisma/client';
-import { PaginateMetadata } from '@app/common';
+import { CreateBoardResponse } from './response/createBoard.response';
 
 @Injectable()
 export class BoardService {
@@ -36,6 +33,9 @@ export class BoardService {
           id: true,
           title: true,
           content: true,
+        },
+        orderBy: {
+          createdAt: query.order,
         },
       })
       .then((boards) =>
@@ -73,6 +73,21 @@ export class BoardService {
       id: board.id,
       title: board.title,
       content: board.content,
+    });
+  }
+
+  async createBoard(userId: string, dto: CreateBoardDto) {
+    const createdBoard = await this.prisma.board.create({
+      data: {
+        ...dto,
+        userId: userId,
+      },
+    });
+    return new CreateBoardResponse({
+      id: createdBoard.id,
+      title: createdBoard.title,
+      content: createdBoard.content,
+      created_at: createdBoard.createdAt,
     });
   }
 }
