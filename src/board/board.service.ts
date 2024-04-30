@@ -1,13 +1,19 @@
 import { PaginateMetadata } from '@app/common';
 import { PrismaService } from '@app/prisma/prisma.service';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { CreateBoardDto, ListBoardQuery } from './dto';
+import { CreateBoardDto, ListBoardQuery, UpdateBoardDto } from './dto';
 import {
   ListBoardItem,
   ListBoardResponse,
 } from './response/listBoard.response';
 import { CreateBoardResponse } from './response/createBoard.response';
+import { UpdateBoardResponse } from './response';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class BoardService {
@@ -89,5 +95,35 @@ export class BoardService {
       content: createdBoard.content,
       created_at: createdBoard.createdAt,
     });
+  }
+
+  async updateBoard(userId: string, dto: UpdateBoardDto, boardId: string) {
+    try {
+      const updatedBoard = await this.prisma.board.update({
+        where: {
+          id: boardId,
+          userId: userId,
+        },
+        data: {
+          ...dto,
+        },
+      });
+      return new UpdateBoardResponse({
+        id: updatedBoard.id,
+        title: updatedBoard.title,
+        content: updatedBoard.content,
+        created_at: updatedBoard.createdAt,
+        updated_at: updatedBoard.updatedAt,
+      });
+    } catch (err) {
+      // Forbidden update request exception
+      if (
+        err instanceof PrismaClientKnownRequestError &&
+        err.code === 'P2025'
+      ) {
+        throw new NotFoundException('Board not found');
+      }
+      throw err;
+    }
   }
 }

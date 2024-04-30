@@ -5,10 +5,11 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
-import { CreateBoardDto, ListBoardQuery } from './dto';
+import { CreateBoardDto, ListBoardQuery, UpdateBoardDto } from './dto';
 import { BoardService } from './board.service';
 import { GetUser } from '@app/common';
 import {
@@ -16,6 +17,7 @@ import {
   CreateBoardDocs,
   ListBoardDocs,
   ReadBoardDocs,
+  UpdateBoardDocs,
 } from './docs';
 
 @Controller('board')
@@ -39,5 +41,15 @@ export class BoardController {
   @CreateBoardDocs
   createBoard(@GetUser('id') userId: string, @Body() dto: CreateBoardDto) {
     return this.service.createBoard(userId, dto);
+  }
+
+  @Patch(':boardId')
+  @UpdateBoardDocs
+  updateBoard(
+    @GetUser('id') userId: string,
+    @Body() dto: UpdateBoardDto,
+    @Param('boardId') boardId: string,
+  ) {
+    return this.service.updateBoard(userId, dto, boardId);
   }
 }
