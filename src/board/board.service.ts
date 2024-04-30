@@ -1,24 +1,37 @@
 import { PrismaService } from '@app/prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ListBoardQuery } from './dto';
-import { ListBoardResponse } from './response/listBoard.response';
+import {
+  ListBoardItem,
+  ListBoardResponse,
+} from './response/listBoard.response';
+import { Prisma } from '@prisma/client';
+import { PaginateMetadata } from '@app/common';
 
 @Injectable()
 export class BoardService {
   constructor(private readonly prisma: PrismaService) {}
 
   async listBoard(userId: string, query: ListBoardQuery) {
-    const responses = await this.prisma.board
+    const queryCondition: Prisma.BoardWhereInput = {
+      userId: userId,
+      title: {
+        contains: query.search,
+        mode: 'insensitive',
+      },
+    };
+    const totalCount = await this.prisma.board.count({
+      where: queryCondition,
+    });
+    const boards = await this.prisma.board
       .findMany({
         take: query.limit,
         skip: (query.page - 1) * query.limit,
-        where: {
-          userId: userId,
-          title: {
-            contains: query.search,
-            mode: 'insensitive',
-          },
-        },
+        where: queryCondition,
         select: {
           id: true,
           title: true,
@@ -28,13 +41,38 @@ export class BoardService {
       .then((boards) =>
         boards.map(
           (board) =>
-            new ListBoardResponse({
+            new ListBoardItem({
               id: board.id,
               title: board.title,
               content: board.content,
             }),
         ),
       );
-    return responses;
+    return new ListBoardResponse({
+      metadata: new PaginateMetadata(query.page, query.limit, totalCount),
+      boards: boards,
+    });
+  }
+
+  async readBoard(userId: string, boardId: string) {
+    const board = await this.prisma.board.findUnique({
+      where: {
+        id: boardId,
+        userId: userId,
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+      },
+    });
+    if (!board) {
+      throw new NotFoundException('Board not found');
+    }
+    return new ListBoardItem({
+      id: board.id,
+      title: board.title,
+      content: board.content,
+    });
   }
 }

@@ -8,6 +8,5 @@ export const ListBoardDocs = applyDecorators(
   }),
   ApiOkResponse({
     type: ListBoardResponse,
-    isArray: true,
   }),
 );
