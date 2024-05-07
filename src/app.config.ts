@@ -65,7 +65,7 @@ export function nestAppConfig<T extends INestApplication = INestApplication>(
 
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(reflector), // Class-Serializer Interceptor
-    new CommonResponseInterceptor(), // Response Payload Interceptor
+    // new CommonResponseInterceptor(), // Response Payload Interceptor
   );
 
   // Enable versioning as URI
